@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <title>Belajar Tailwind</title>
+</head>
+
+<body class="bg-gray-100">
+  <div id="notification-container" class="fixed bottom-4 left-4 space-y-2"></div>
+
+  <div class="container mx-auto flex justify-center items-center h-screen">
+    <!-- Hero Section Start -->
+    <div class="p-8 rounded w-96">
+      <h1 class="text-3xl font-body font-semibold mb-4">Sign In</h1>
+      <p class="text-gray-600 mb-4">
+        Masukkan Email dan Password untuk masuk ke akun anda
+      </p>
+      <form id="LoginForm">
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" id="email" name="email"
+            class="mt-2 block w-full py-2 px-3 rounded-md outline-1 border-x border-2 border-gray-300 focus:border-blue-600 focus:ring focus:ring-blue-600 focus:ring-opacity-50"
+            placeholder="Masukkan Email" />
+        </div>
+        <div class="mb-4">
+          <label for="Password" type="Password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="password" name="password"
+            class="mt-2 block w-full py-2 px-3 rounded-md outline-1 border-2 border-gray-300 focus:border-blue-600 focus:ring focus:ring-blue-600 focus:ring-opacity-50"
+            placeholder="Masukkan Password" />
+        </div>
+
+        <button type="submit"
+          class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50 my-6">
+          Sign In
+        </button>
+      </form>
+      <button onclick="signInWithGoogle()"
+        class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50 my-2">
+        Sign In With Google
+      </button>
+      <div class="flex items-center justify-between mb-4">
+        <div class="text-sm">
+          <a href="/to/to-forgetPassword" class="font-medium text-blue-600 hover:text-blue-500">Lupa Password?</a>
+        </div>
+        <div class="text-sm flex space-x-2">
+          <p>Belum Terdaftar?</p>
+          <a href="/to/to-signup" class="font-medium text-blue-600 hover:text-blue-500">Buat Akun</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-white text-white p-4">
+    <div class="container mx-auto flex items-center justify-between">
+      <!-- Logo -->
+      <div class="logo flex space-x-3">
+        <img src="/img/upnsehat-kecil.png" alt="Logo" class="h-8" />
+        <img src="/img/upn-kecil.png" alt="Logo" class="h-8" />
+      </div>
+      <!-- Hak Cipta -->
+      <p class="text-sm text-gray-900">
+        &copy; 2024, Studi Informatika, Fakultas Ilmu Komputer. Hak Cipta
+        Dilindungi
+      </p>
+    </div>
+  </footer>
+
+  <!-- Login Manual Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const loginForm = document.getElementById('LoginForm');
+      if (loginForm) {
+        loginForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+
+          try {
+            const response = await fetch('http://localhost:3000/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email, password })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              document.cookie = `uid=${data.message}; path=/`;
+              showNotification('Login successful!', 'success');
+              window.location.href = '/';
+            } else {
+              const error = await response.json();
+              showNotification('Login Gagal: ' + 'username/password salah');
+            }
+          } catch (error) {
+            showNotification('Login Gagal: ' + error.message, 'error');
+          }
+        });
+      }
+
+      function showNotification(message, type) {
+        const container = document.getElementById('notification-container');
+        const notification = document.createElement('div');
+
+        notification.className = `px-4 py-2 rounded text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+        notification.innerText = message;
+
+        container.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 3000); // Remove the notification after 3 seconds
+      }
+    });
+  </script>
+
+    <!-- login with google -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDY55K4D6ggvqSSD3h4jwB7VOU7zbSyd64",
+      authDomain: "arif-9e465.firebaseapp.com",
+      databaseURL: "https://arif-9e465-default-rtdb.firebaseio.com",
+      projectId: "arif-9e465",
+      storageBucket: "arif-9e465.appspot.com",
+      messagingSenderId: "700412186025",
+      appId: "1:700412186025:web:a6a6c98813b3ac702948b8",
+      measurementId: "G-KDLQTCNSSR"
+    };
+
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    function setCookie(name, value, days) {
+      var expires = "";
+      if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    // Function to handle sign in
+    async function signInWithGoogle() {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const idToken = await result.user.getIdToken();
+
+        // Send the ID token to your server for verification
+        const response = await fetch('http://localhost:3000/verify-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ idToken })
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Server response:', data);
+
+        // Save UID to local storage
+        setCookie('uid', data.result, 7); // Menggunakan 'result' dari respons
+
+        // Redirect to index.html
+        window.location.href = '/';
+      } catch (error) {
+        console.error('Error during sign in:', error);
+        document.getElementById('status').textContent = `Error during sign in: ${error.message}`;
+      }
+    }
+    window.signInWithGoogle = signInWithGoogle;
+  </script>
+</body>
+
+</html>

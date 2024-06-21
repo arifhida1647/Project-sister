@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <title>Halaman Signup</title>
+  <style>
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-left: 8px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .invalid {
+      border-color: red;
+    }
+
+    .valid {
+      border-color: green;
+    }
+
+    .error-message {
+      color: red;
+      display: none;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <div id="notification-container" class="fixed bottom-4 left-4 space-y-2"></div>
+
+ 
+
+  <div class="container mx-auto flex justify-center items-center h-screen">
+    <!-- Hero Section Start -->
+    <div class="p-8 rounded w-96">
+      <h1 class="text-3xl font-body font-semibold mb-4">Register</h1>
+      <p class="text-gray-600 mb-4">
+        Masukkan Nama, Email dan Password untuk membuat akun anda
+      </p>
+      <form id="registrationForm">
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium text-gray-700">Nama</label>
+          <input type="text" id="name" name="name"
+            class="mt-2 block w-full py-2 px-3 rounded-md outline-1 border-2 border-gray-300 focus:border-blue-600 focus:ring focus:ring-blue-600 focus:ring-opacity-50"
+            placeholder="Masukkan Nama" required />
+        </div>
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" id="email" name="email"
+            class="mt-2 block w-full py-2 px-3 rounded-md outline-1 border-2 border-gray-300 focus:border-blue-600 focus:ring focus:ring-blue-600 focus:ring-opacity-50"
+            placeholder="Masukkan Email" required />
+          <span class="error-message" id="email-error" style="display:none; color:red;">Email tidak valid.</span>
+        </div>
+        <div class="mb-4">
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="password" name="password"
+            class="mt-2 block w-full py-2 px-3 rounded-md outline-1 border-2 border-gray-300 focus:border-blue-600 focus:ring focus:ring-blue-600 focus:ring-opacity-50"
+            placeholder="Masukkan Password" required />
+          <span class="error-message" id="password-error" style="display:none; color:red;">Password harus terdiri dari
+            minimal 6 karakter.</span>
+        </div>
+        <button type="submit"
+          class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50 my-6">
+          Sign Up
+        </button>
+      </form>
+
+      <div class="text-sm flex space-x-2">
+        <p>Sudah Daftar?</p>
+        <a href="/to-login" class="font-medium text-blue-600 hover:text-blue-500">Masuk</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-white text-white p-4">
+    <div class="container mx-auto flex items-center justify-between">
+      <!-- Logo -->
+      <div class="logo flex space-x-3">
+        <img src="/img/upnsehat-kecil.png" alt="Logo" class="h-8" />
+        <img src="/img/upn-kecil.png" alt="Logo" class="h-8" />
+      </div>
+      <!-- Hak Cipta -->
+      <p class="text-sm text-gray-900">
+        &copy; 2024, Studi Informatika, Fakultas Ilmu Komputer. Hak Cipta
+        Dilindungi
+      </p>
+    </div>
+  </footer>
+
+  <!-- hamburger -->
+  <script>
+    const hamburger = document.querySelector("#hamburger");
+    const navMenu = document.querySelector("#nav-menu");
+
+    hamburger.addEventListener("click", function () {
+      hamburger.classList.toggle("hamburger-active");
+      navMenu.classList.toggle("hidden");
+    });
+
+  </script>
+
+  <!-- register -->
+  <script>
+    document.getElementById('password').addEventListener('input', function () {
+      const passwordInput = document.getElementById('password');
+      const errorMessage = document.getElementById('password-error');
+      const password = passwordInput.value;
+
+      if (password.length < 6) {
+        passwordInput.classList.add('invalid');
+        passwordInput.classList.remove('valid');
+        errorMessage.style.display = 'block';
+      } else {
+        passwordInput.classList.remove('invalid');
+        passwordInput.classList.add('valid');
+        errorMessage.style.display = 'none';
+      }
+    });
+
+    document.getElementById('registrationForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const submitButton = event.target.querySelector('button[type="submit"]');
+      const emailErrorMessage = document.getElementById('email-error');
+      const spinner = document.createElement('span');
+      spinner.classList.add('spinner');
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailPattern.test(email)) {
+        emailErrorMessage.style.display = 'block';
+        return;
+      } else {
+        emailErrorMessage.style.display = 'none';
+      }
+
+      if (password.length < 6) {
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.appendChild(spinner);
+
+      try {
+        const response = await fetch('http://localhost:3000/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Network response was not ok');
+          showNotification('Error : ' + errorData.message);
+        }
+        
+        showNotification('Register successful!', 'success');
+        const data = await response.json();
+        document.cookie = `uid=${data.message}; path=/`;
+        window.location.href = '/';
+      } catch (error) {
+        showNotification('Error : ' + error.message);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.removeChild(spinner);
+      }
+    });
+    function showNotification(message, type) {
+      const container = document.getElementById('notification-container');
+      const notification = document.createElement('div');
+
+      notification.className = `px-4 py-2 rounded text-white ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+      notification.innerText = message;
+
+      container.appendChild(notification);
+
+      setTimeout(() => {
+        notification.remove();
+      }, 3000); // Remove the notification after 3 seconds
+    }
+  </script>
+
+</body>
+
+</html>
