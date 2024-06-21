@@ -1,4 +1,4 @@
-Berikut adalah file README untuk proyek "UPN Sehat":
+
 
 ---
 
